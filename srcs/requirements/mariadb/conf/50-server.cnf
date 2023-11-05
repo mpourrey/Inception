@@ -1,0 +1,13 @@
+
+# port : indique que mysql communique avec les autres services via son port 3306
+#       la connexion entre nginx et mysql s'etablit avec le protocole tcp/ip (et/ou le socket de mysql)
+# bind_adress=* : toutes les adresses ip du reseau peuvent se connecter au serveur mysql (
+#       sous reseau docker + toutes les ip de la machine hote)
+# datadir : fichier de stockage de la base de donnees
+# user : le service sera execute en tant que cet utilisateur (cree lors de l'installation)
+
+[mysqld]
+port=3306
+bind-address=*
+datadir=/var/lib/mysql
+user=mysql

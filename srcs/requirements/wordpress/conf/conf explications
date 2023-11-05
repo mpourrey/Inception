@@ -1,0 +1,16 @@
+###FICHIER DE CONFIGURATION
+#comment sont gerees les requetes php entrantes par le gestionnaire de processus php (via ses processus enfants)
+
+#listen : port sur lequel php ecoutera les requetes entrantes
+#clear_env = no : l'env n'est pas clear dans les processus enfants
+
+#FICHIER CONF DE BASE
+# [www]
+# listen = /run/php/php7.4-fpm.sock
+# listen.owner = www-data
+# listen.group = www-data
+# pm = dynamic
+# pm.max_children = 5
+# pm.start_servers = 2
+# pm.min_spare_servers = 1
+# pm.max_spare_servers = 3

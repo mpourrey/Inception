@@ -1,0 +1,62 @@
+version: '3'
+services:
+
+  mariadb:
+    container_name: mariadb
+    networks:
+      - inception  	
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile	
+    volumes:
+      - "mariadb_database:/var/lib/mysql"
+    env_file: .env
+    restart: unless-stopped # redemarrage automatique sauf si stop a la main
+
+  wordpress:
+    container_name: wordpress
+    networks:
+      - inception
+    build: 
+      context: requirements/wordpress
+      dockerfile: Dockerfile
+    volumes:
+      - wordpress_files:/var/www/html/wordpress
+    depends_on:  # WordPress démarrera uniquement après MariaDB (config de BD apres que celle ci soit creee)
+      - mariadb
+    env_file: .env
+    restart: on-failure # redemarrage uniquement en cas de crash
+
+  nginx:
+    container_name: nginx
+    networks:
+     - inception
+    build: 
+      context: requirements/nginx
+      dockerfile: Dockerfile
+    volumes:
+      - wordpress_files:/var/www/html/wordpress
+    depends_on:        			 # ne pas démarrer NGINX tant que WordPress n'a pas démarré.
+      - wordpress
+    env_file: .env
+    restart: on-failure 		# redemarrage uniquement en cas de crash
+    ports:
+     - "443:443" 		# fait correspondre le port 443 du conteneur avec le port 443 de l'hote
+
+volumes:
+  mariadb_database:
+    driver: local # driver=outil de gestion du stockage, ici le volume sera stocke en local sur l'hote
+    driver_opts: # options de driver
+      type: 'none' # le volume peut etre modifie a l'exterieur de docker
+      o: 'bind'		# volume Bind Mounts = lie a un chemin d'acces sur l'hote
+      device: '/home/mpourrey/data/mariadb_database'	# ou stocker le dossier en local  
+  wordpress_files:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/mpourrey/data/wordpress_files'
+
+networks: # faire partie du meme reseau permet la communication entre les conteneurs
+  inception:
+    driver: bridge # les conteneurs sont organises dans un sous reseau prive et obtiennent une ip
